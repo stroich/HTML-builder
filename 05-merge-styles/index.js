@@ -3,6 +3,14 @@ const { join } = require('node:path');
 const path = require('path');
 const readline = require('readline');
 
+fs.writeFile(
+  path.join(__dirname, 'project-dist', 'bundle.css'),
+  '',
+  (err) => {
+    if (err) throw err;
+  },
+);
+
 async function fileToArray(file) {
   const filepath = join(__dirname, 'styles', file.name);
   const input = fs.createReadStream(filepath);
@@ -20,17 +28,17 @@ async function fileToArray(file) {
 }
 
 async function writeFile(file) {
-  const arr = await fileToArray(file);
-  fs.writeFile(
+  const arr = await fileToArray(file);  
+  fs.appendFile(
     path.join(__dirname, 'project-dist', 'bundle.css'),
-    '',
+    arr.join('\n'),
     (err) => {
       if (err) throw err;
     },
   );
   fs.appendFile(
     path.join(__dirname, 'project-dist', 'bundle.css'),
-    arr.join('\n'),
+    '\n',
     (err) => {
       if (err) throw err;
     },
