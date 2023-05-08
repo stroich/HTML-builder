@@ -43,6 +43,13 @@ function createCss() {
         if (err) throw err;
       },
     );
+    fs.appendFile(
+      path.join(__dirname, 'project-dist', 'style.css'),
+      '\n',
+      (err) => {
+        if (err) throw err;
+      },
+    );
   }
 
   fs.readdir(join(__dirname, 'styles'), { withFileTypes: true }, (error, files) => {
