@@ -1,25 +1,12 @@
 const fs = require('fs');
 const { mkdir } = require('node:fs/promises');
 const { join } = require('node:path');
+const fsPromises = require('node:fs/promises');
+
+const projectFolderCopy = join(__dirname, 'files-copy');
+const projectFolder = join(__dirname, 'files');
 
 function copyDir() {
-  const projectFolderCopy = join(__dirname, 'files-copy');
-  const projectFolder = join(__dirname, 'files');
-
-  mkdir(projectFolderCopy, { recursive: true });
-  function deleteFiles() {
-    fs.readdir(projectFolderCopy, (error, filesСopy) => {
-      if (error) throw error;
-      if (filesСopy.length > 0) {
-        filesСopy.forEach((fileCope) => {
-          const projectFileCopy = join(projectFolderCopy, fileCope);
-          fs.unlink(projectFileCopy, (err) => {
-            if (err) throw err;
-          });
-        });
-      }
-    });
-  }
   function copyFiles() {
     fs.readdir(projectFolder, (error, files) => {
       if (error) throw error;
@@ -30,7 +17,23 @@ function copyDir() {
       });
     });
   }
-  deleteFiles();
-  copyFiles();
+  async function deleteFiles() {
+    await fsPromises.rm(projectFolderCopy, {
+      recursive: true,
+      force: true,
+      maxRetries: 100,
+    });
+    mkdir(projectFolderCopy, { recursive: true });
+    copyFiles();
+  }
+
+  fs.access(projectFolderCopy, (err) => {
+    if (err) {
+      mkdir(projectFolderCopy, { recursive: true });
+      copyFiles();
+    } else {
+      deleteFiles();
+    }
+  });
 }
 copyDir();
